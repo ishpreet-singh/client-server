@@ -10,32 +10,33 @@
 
 void servicePlayers(int sd1, int sd2)
 {
-    char message[255], message1[255], message2[255], response1[255], response2[255];
+
+    char message[255],response1[255], response2[255];
+    char player1[5] = "TOTO";
+    char player2[5] = "TITI";
+    int target = 25;
+
     while (1)
     {
-        int total1 = 0, total2 = 0, target = 30;
+        int total1 = 0, total2 = 0;
 
         while (total1 < target && total2 < target)
         {
             memset(message, 0, sizeof message);
             strcpy(message, "You can now play");
 
-            fprintf(stdout, "%s %s\n", message, "TOTO");
-
-            // memset(message1, 0, sizeof message1);
-            // strcpy(message1, "You can now play");
+            fprintf(stdout, "%s %s\n", message, player1);
             write(sd1, message, strlen(message) + 1);
 
             if (!read(sd1, response1, 255))
             {
                 close(sd1);
-                fprintf(stderr, "Bye, client dead, wait for a new client\n");
                 exit(0);
             }
 
             total1 += atoi(response1);
-            fprintf(stdout, "TOTO send: %d\n", atoi(response1));
-            fprintf(stdout, "TOTO Current Total: %d\n", total1);
+            fprintf(stdout, "%s send: %d\n", player1, atoi(response1));
+            fprintf(stdout, "%s's Current Total: %d\n", player1, total1);
 
             if (total1 >= target)
             {
@@ -44,22 +45,18 @@ void servicePlayers(int sd1, int sd2)
 
             sleep(1);
 
-            // fprintf(stdout, "You can now play TITI\n");
-            fprintf(stdout, "%s %s\n", message, "TITI");
+            fprintf(stdout, "%s %s\n", message, player2);
             write(sd2, message, strlen(message) + 1);
-            // memset(message2, 0, sizeof message2);
-            // strcpy(message2, "You can now play");
-            // write(sd2, message2, strlen(message2) + 1);
-
+            
             if (!read(sd2, response2, 255))
             {
                 close(sd2);
-                fprintf(stderr, "Bye, client dead, wait for a new client\n");
                 exit(0);
             }
+
             total2 += atoi(response2);
-            fprintf(stdout, "TITI send: %d\n", atoi(response2));
-            fprintf(stdout, "TITI Current Total: %d\n", total2);
+            fprintf(stdout, "%s send: %d\n", player2, atoi(response2));
+            fprintf(stdout, "%s's Current Total: %d\n", player2, total2);
 
             sleep(1);
         }
@@ -68,15 +65,15 @@ void servicePlayers(int sd1, int sd2)
         if (total1 >= target)
         {
 
-            memset(message1, 0, sizeof message1);
-            strcpy(message1, "Game over: you won the game");
-            fprintf(stdout, "Game over: TOTO won the game\n");
-            write(sd1, message1, strlen(message1) + 1);
+            memset(message, 0, sizeof message);
+            strcpy(message, "Game over: you won the game");
+            fprintf(stdout, "Game over: %s won the game\n", player1);
+            write(sd1, message, strlen(message) + 1);
             close(sd1);
 
-            memset(message2, 0, sizeof message2);
-            strcpy(message2, "Game over: you lost the game");
-            write(sd2, message2, strlen(message2) + 1);
+            memset(message, 0, sizeof message);
+            strcpy(message, "Game over: you lost the game");
+            write(sd2, message, strlen(message) + 1);
             close(sd2);
             exit(0);
         }
@@ -85,14 +82,15 @@ void servicePlayers(int sd1, int sd2)
         else if (total2 >= target)
         {
 
-            memset(message1, 0, sizeof message1);
-            strcpy(message1, "Game over: you lost the game");
-            fprintf(stdout, "Game over: TITI won the game\n");
-            write(sd1, message1, strlen(message1) + 1);
+            memset(message, 0, sizeof message);
+            strcpy(message, "Game over: you lost the game");
+            fprintf(stdout, "Game over: %s won the game\n", player2);
+            write(sd2, message, strlen(message) + 1);
 
-            memset(message2, 0, sizeof message2);
-            strcpy(message2, "Game over: you won the game");
-            write(sd2, message2, strlen(message2) + 1);
+            memset(message, 0, sizeof message);
+            strcpy(message, "Game over: you lost the game");
+            fprintf(stdout, "Game over: %s lost the game\n", player1);
+            write(sd1, message, strlen(message) + 1);
             exit(0);
 
         }
@@ -123,8 +121,12 @@ int main(int argc, char *argv[])
 
     while (1)
     {
+        fprintf(stdout, "Waiting for players to Join\n");
+
         client1 = accept(sd, (struct sockaddr *)NULL, NULL);
         client2 = accept(sd, (struct sockaddr *)NULL, NULL);
+        
+        fprintf(stdout, "Two players Joined\n");
 
         if (!fork())
         {
