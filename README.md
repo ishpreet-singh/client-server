@@ -1,2 +1,2 @@
 # client-server
-System Programming Project to demonstrate a Client Server using C programming language
+A dice game to interact between multiple clients with server using socket programming
